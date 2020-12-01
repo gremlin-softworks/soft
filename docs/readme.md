@@ -7,6 +7,7 @@ v.0.7a
 Utilizes dependency injection as the only reference method within modules that are created, apps use fragments that can act as independent applications and are bound in the DOM with custom elements.
 This provides the following features:
 - DOM <-> module binding using custom elements.
+- DOM binding functions such as repeaters, events, dynamic classes and injection.
 - CSS encapsulation for fragment modules.
 - Pure html templating for fragments.
 - Easy to track all (in framework) dependencies and their physical locations.
@@ -23,13 +24,15 @@ This provides the following features:
 
 # Support and limitations
 
-Supports any modern ES6 capable browser, Internet Explorer is not supported. However, if modules and dynamic module loading is supported, soft modules may be full blown js modules with the only requirement of providing a properly formed default function. When so, third party modules can be loaded with the import statement limiting scope pollution. Browsers that does not support native custom elements are not supported (Edge before webkit).A polyfill like [this one](https://github.com/WebReflection/document-register-element) can be used to remedy this.
+Supports any modern ES6 capable browser.
 
-If dynamic module loading support is missing the framework will attempt to dirtyload the module code, stripping away any import statements and interpeting the default function. If support wont be present, only supply the default export in your modules. Currently all modern browsers support dynamic loading with the exception of Mozilla that does not allow this in code executed in a worker context.
+If dynamic module loading support is missing in the environment (mozilla inside worker context) the framework will attempt to dirtyload the module code, stripping away any import statements and interpeting the default function. If support wont be present, only supply the default export in your modules.
 
 # Documentation
 
-This covers the most important bits. When using soft you need to reference soft.js and the main app(s) files. No need to reference any other modules. Framework modules are covered [here](modules.md).
+This covers the most important bits. When using soft you need to reference soft.js and the main app(s) files. No need to reference any other modules. Framework modules are covered [here](modules.md).  
+Workers for multithreading are covered [here](softworker.md) and also in the [framework modules section](modules.md).  
+DOM bindings are covered [here](softbinding.md).
 
 #### Basic components:
 
@@ -38,9 +41,8 @@ This covers the most important bits. When using soft you need to reference soft.
 - **proto** *Regular module for application logic, injected into all other types of modules.*
 - **singleton** *Singleton module.*
 - **master** *Master object, provides the app and the interface to create new modules.*
-- **$gmn** *Provides the master object and a few structural compontents and helpsers.*
+- **$gmn** *Provides the master object and a few structural compontents and helpers.*
 
-  
   
 ## Including soft
 
@@ -68,13 +70,33 @@ Example index.html
 </html>
 ```
 
-
-
 ## The $gmn and master object
 
 Master is the main framwork object, its used for creating new modules (fragments, singletons or protos), $gmn also contains a limited number of utility methods. 
 
 Apps, fragments, protos and singletons must all provide an array of dependency references and a definition function having the dependencies as arguments. For protos and singletons its what the definition returns that is injected into other modules.
+
+Since all code is loaded as modules you can freely import external code in an traditional way. 
+This is provided it's not code you want to run inside worker context on Mozilla.
+
+```
+import { jszip } from '/vendor/jszip.min.js';
+
+export default function(master) {
+    return master.singleton(['dependency'], function (dependency) {
+
+        return class Zipper {
+
+            static zip(files) {
+                const zip = new jszip.JSZip();
+                files.forEach(e => zip.file(e.name, e.data));
+                return zip.generateAsync({type: 'uint8array'})
+            }
+        }
+    });
+};
+```
+
 
 ### ```$gmn.master(options).app([dependencies], definition)```
 
@@ -117,8 +139,7 @@ Any css declared in the meta object will be isolated to the fragment and the pro
 The fragment module acts basically as a singleton and the defintion will only be called once.
 
 The fragment is bound to the dom by the ```self``` object (the second instance parameter). This is a proxy object. Bind any functions or data on this that you want to expose to dom. Query the root object (the fragments dom) to access any other scoped data in child fragments or other scopes inferred (ie. using ```soft-for```). 
-This is done using ```root.softSelector``` or ```root.softSelectorAll``` which are convience methods matching ```root.querySelector``` and ```root.querySelectorAll``` but makes it easy to access any bound data via the ```soft``` property on the resulting element. 
-The property is read only and is the ```self``` object on that scope.
+This is done using ```root.softSelector``` or ```root.softSelectorAll``` which are convience methods matching ```root.querySelector``` and ```root.querySelectorAll``` but returning bound data.
 
 ```
 export default function(master) {
@@ -147,6 +168,15 @@ export default function(master) {
 
 #### ```$attributes``` 
 - Provides object based access to attributes where attributes can be accessed as properties. For example ```self.$attributes.myname```. If the attribute is a bound variable (ie. injected in an attribute via dom, this is covered [here](softbinding.md)) the property will be the injected object. The object cannot be retrieved by querying attributes.
+
+```
+<some-mod myobj="{ obj }"></some-mod>
+```
+```
+instance: (root, self) => { 
+    doStuff(self.$attributes.myobj);
+}
+```
 
  #### ```soft``` 
  - The self object as descibed earlier. This is the second instance parameter. 
@@ -213,9 +243,6 @@ export default function (master) {
     });
 };
 ```
-# Soft in the worker scope
-  
-See the [softworker section](softworker.md) for details on implementing a softworker client in a module.
 
 # Softconfig.json
 
