@@ -61,14 +61,19 @@ export default function(context) {
                             root.querySelectorAll("[soft-click]").forEach(e => e.addEventListener('click', () => evaluator.evaluate(e.getAttribute('soft-click'), data)));
     
                             root.querySelectorAll("[soft-on]").forEach(e => {
-                                const args = e.getAttribute('soft-on').split(':');
-                                e.addEventListener(args[0], () => evaluator.evaluate(args[1], data));
+                                e.getAttribute('soft-on').split(';').forEach(x => {
+                                    const args = x.trim().split(':');
+                                    e.addEventListener(args[0], () => evaluator.evaluate(args[1], data));
+                                });
                             });
     
                             root.querySelectorAll("[soft-on-event]").forEach(e => {
-                                e.getAttribute('soft-on-event').split('|').forEach(x => {
-                                    const args = x.split(':');
-                                    e.addEventListener(args[0], e => evaluator.evaluate(args[1], data)(e));
+                                e.getAttribute('soft-on-event').split(';').forEach(x => {
+                                    const args = x.trim().split(':');
+                                    e.addEventListener(args[0], e => {
+                                        e.soft = data;
+                                        return evaluator.evaluate(args[1], data)(e);
+                                    });
                                 });
                             });
     
@@ -99,6 +104,8 @@ export default function(context) {
                                 }
                             }
                         };
+
+                        /* mind the repeater problem. 1st instance is by touch in template */
     
                         class FragmentElement extends HTMLElement {
     
@@ -108,7 +115,6 @@ export default function(context) {
     
                                 const template = views.__templateRoot.querySelector('#' + id);
                                 template.innerHTML = template.innerHTML.replace(/\{\{([\sa-zA-Z0-9_.]+)\}\}/g, (_, e) => '<span class="softspan__">{0}</span>'.format(e.trim()));
-                                //template.innerHTML = template.innerHTML.replace(/<!--(.*?)-->/g, '');
     
                                 const clone = template.content.cloneNode(true);
                                 const root = this.attachShadow({ mode: 'open' });
@@ -125,41 +131,6 @@ export default function(context) {
                                     dirty.set = null;
                                 });
     
-                                const change = (source, root) => {
-                                    return {
-                                        get: (target, property) => {
-                                            dirty();
-                                            return target[property];
-                                        },
-                                        set: (target, property, value, receiver) => {
-                                            const old = target[property];
-                                            target[property] = value;
-                                            dirty();
-                                            const data = source();
-                                            if (data) {
-                                                root.querySelectorAll('[soft-class]').forEach(e => {
-                                                    e.getAttribute('soft-class').split(';').forEach(x => {
-                                                        const src = x.split(':');
-                                                        if (src.length === 1) {
-                                                            e.classList.remove(old);
-                                                        }
-                                                    })
-                                                });
-                                                root.querySelectorAll('[soft-model]').forEach(e => {
-                                                    let softtarget = e.getAttribute('soft-model').split('.');
-                                                    const prop = softtarget.pop();
-                                                    softtarget = softtarget.length === 0 ? self : evaluator.evaluate(softtarget.join('.'), data);
-    
-                                                    if (target === softtarget && prop === property) {
-                                                        e.value = value;
-                                                    }
-                                                });
-                                            }
-                                            return true;
-                                        }
-                                    };
-                                };
-    
                                 safeInstance().then(() => {
                                     for (let i = 0; i < this.attributes.length; i++) {
                                         const attribute = this.attributes[i];
@@ -171,7 +142,17 @@ export default function(context) {
                                             this.$attributes[attribute.name] = attribute.value;
                                         }
                                     }
-                                    const proxy = new Proxy(this, change(() => this._data, this._root));
+                                    const proxy = new Proxy(this, {
+                                        get: (target, property) => {
+                                            dirty();
+                                            return target[property];
+                                        },
+                                        set: (target, property, value, receiver) => {
+                                            target[property] = value;
+                                            dirty();
+                                            return true;
+                                        }
+                                    });
                                     this._data = module.instance(root, proxy) || proxy;
                                     softbind(this._root, this._data);
     
@@ -239,6 +220,12 @@ export default function(context) {
                                                 const add = pair.length > 1 ? evaluator.evaluate(pair[1], data) : true;
                                                 add ? e.classList.add(cls) : e.classList.remove(cls);
                                             });
+                                        }
+                                    });
+
+                                    root.querySelectorAll('[soft-model]').forEach(e => {
+                                        if (isCurrentStack(e)) {
+                                            e.value = evaluator.evaluate(e.getAttribute('soft-model'), data);
                                         }
                                     });
     
