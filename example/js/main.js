@@ -1,0 +1,3 @@
+$gmn.master().app([], function() {
+
+});

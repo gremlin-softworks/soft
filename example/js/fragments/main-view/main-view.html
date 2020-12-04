@@ -1,0 +1,37 @@
+<div class="section">
+    <div class="container">
+        <h1 class="title">Welcome to {{ obj.name }}</h1>
+        <h2 class="subtitle">
+          Example & test page for soft
+        </h2>
+        <div class="columns">
+            <div class="column">
+                <div class="control">
+                    <input class="input is-primary" type="text" soft-on="focus:obj.seen=true;blur:obj.seen=false" soft-model="obj.name" />
+                </div>
+                <div class="notification is-info" soft-show="obj.seen">Yes, change it</div>
+            </div>
+            <div class="column">
+                <div class="control">
+                    <input type="text" class="input" soft-model="obj.name" />
+                </div>
+            </div>
+        </div>
+        <button class="button btn" soft-on-event="click:additem">Add thing</button>
+        <button class="button btn" soft-class="'red':items.length == false" soft-click="clear()">Clear things</button>
+        <label class="checkbox">
+            <input type="checkbox" soft-model="obj.showbig" />
+            Show panel
+        </label>
+        <div class="notification is-light is-primary" soft-show="obj.showbig">
+            You have {{ items.length }} things.
+        </div>
+        <div soft-for="item:items">
+            <div class="go-thing is-info">
+                <a soft-click="close(item)" class="delete"></a>
+                <thing-item item="{item}"></thing-item>
+            </div>
+        </div>
+    </div>
+</div>
+

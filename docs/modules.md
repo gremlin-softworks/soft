@@ -92,9 +92,11 @@ The actual pool, used to build and access workers. Instances are created via a f
 - Requests a worker promise style. If one is free it is assigned immediately, otherwise one will be assigned when available.
 
 ```
-const workerpool = pool.construct().build(3, 'path-to-cool-worker.js');
+const workerpool = pool.construct().build(3);
 
-pool.request().then(worker => {
+pool.request().then(async worker => {
+
+    await worker.connect('path-to-cool-worker.js');
     // ...
 });
 ```
@@ -120,12 +122,12 @@ The wrapped worker returned on requesting or aquiring a worker. This is used for
 ```
 pool.request().then(worker => {
 
-    worker.connect(data => {
-        // ...
-        worker.release();
-    }):
-
-    worker.post(someData);
+    worker.connect('/worker.js').then(() => {
+        worker.post(someData).then(data => {
+            worker.release(); //<-- or keep it around if it suits your needs.
+            ....
+        })
+    });
 });
 ```
 

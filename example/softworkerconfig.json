@@ -1,0 +1,7 @@
+{
+    "scriptPath": "/example/js/workers",
+    "modules": {
+        "mandel": "mandel.js",
+        "workerone": "workerone.js"
+    }
+}

@@ -1,0 +1,15 @@
+{
+    "scriptPath": "/example/js/",
+    "commonCss": [
+        "/example/css/style.css",
+        "/example/css/bulma.min.css"
+    ],
+    "modules": {
+        "generator": "generator.js",
+        "item": "item.js"
+    },
+    "fragments": {
+        "thing-item": "fragments/thing-item/thing-item.js",
+        "main-view": "fragments/main-view/main-view.js"
+    }
+}

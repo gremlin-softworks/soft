@@ -1,0 +1,28 @@
+.btn {
+    margin-bottom: 20px;
+}
+
+.go-thing {
+    width: 128px;
+    float: left;
+    margin: 5px;
+    padding: 5px;
+    border-radius: 10px;
+    text-align: right;
+    background-color: rgb(163, 208, 238);
+}
+
+.close {
+    float: right;
+    top: 0;
+    color: white;
+    background-color: rgb(199, 44, 44);
+    border-radius: 20px;
+    padding: 5px 10px;
+    margin: 0 10px -10px 0px;
+    cursor: pointer;
+}
+
+.red {
+    background-color: rgb(240, 140, 140);
+}

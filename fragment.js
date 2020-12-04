@@ -32,67 +32,9 @@ export default function(context) {
         return new Promise(resolve => {
             master.singleton(modules, defintion).then(module => {
                 fetch($gmn.combine(config.scriptPath ? config.scriptPath : context.baseUrl, meta.template + '?cache=' + $gmn.start)).then(e => e.text()).then(html => {
-                    master.proto(['$eventhandler', '$evaluator'], (eventhandler, evaluator) => {
+                    master.proto(['$eventhandler', '$evaluator', '$cyclone'], (eventhandler, evaluator, cyclone) => {
     
                         const id = registerTemplate(html, meta.css);
-                        const sftrp = []; // clean up with mutator? can leak memory if elements are removed from higher up in the tree?
-    
-                        const softbind = (root, data) => {
-                            root._scope = data;
-    
-                            const forcurse = element => {
-                                element.querySelectorAll('[soft-for]').forEach(el => {
-                                    forcurse(el);
-                                    if (el.parentNode) {
-                                        const holder = document.createElement('span');
-                                        holder.className = 'softrepeat__';
-                                        holder.setAttribute('_sftrp', sftrp.length);
-                                        sftrp.push(el);
-                                        el.parentNode.insertBefore(holder, el);
-                                        el.parentNode.removeChild(el);
-                                    }
-                                });
-                            };
-    
-                            forcurse(root);
-    
-                            root.querySelectorAll('.softspan__').forEach(e => e.target = e.innerHTML.split('.'));
-    
-                            root.querySelectorAll("[soft-click]").forEach(e => e.addEventListener('click', () => evaluator.evaluate(e.getAttribute('soft-click'), data)));
-    
-                            root.querySelectorAll("[soft-on]").forEach(e => {
-                                e.getAttribute('soft-on').split(';').forEach(x => {
-                                    const args = x.trim().split(':');
-                                    e.addEventListener(args[0], () => evaluator.evaluate(args[1], data));
-                                });
-                            });
-    
-                            root.querySelectorAll("[soft-on-event]").forEach(e => {
-                                e.getAttribute('soft-on-event').split(';').forEach(x => {
-                                    const args = x.trim().split(':');
-                                    e.addEventListener(args[0], e => {
-                                        e.soft = data;
-                                        return evaluator.evaluate(args[1], data)(e);
-                                    });
-                                });
-                            });
-    
-                            root.querySelectorAll('[soft-model]').forEach(e => {
-                                e.value = evaluator.evaluate(e.getAttribute('soft-model'), data);
-                                ['change', 'keyup', 'paste'].forEach(event => 
-                                    e.addEventListener(event, () => evaluator.property(e.getAttribute('soft-model'), e.value, data))
-                                );
-                            });
-                        };
-    
-                        const scopemerge = (element, data) => {
-                            while (element = element?.parentNode) {
-                                if (element._scope) {
-                                    data = Object.assign({}, element._scope, data);
-                                }
-                            }
-                            return data;
-                        };
     
                         const climb = (element, value) => {
                             while (element = element?.parentNode || element?.host) {
@@ -154,7 +96,7 @@ export default function(context) {
                                         }
                                     });
                                     this._data = module.instance(root, proxy) || proxy;
-                                    softbind(this._root, this._data);
+                                    cyclone.softbind(this._root, this._data);
     
                                     dirty();
                                 });
@@ -173,103 +115,8 @@ export default function(context) {
                             }
     
                             refresh(root, data) {
-    
-                                root = root || this._root;
-                                data = data || this._data;
-    
-                                const isCurrentStack = element => {
-                                    let track = element;
-                                    while ((track = track.parentNode) && track !== root) {
-                                        if (track._scope) {
-                                            return false;
-                                        }
-                                    }
-                                    return true;
-                                };
-    
-                                if (data) {
-                                    root.querySelectorAll('.softspan__').forEach(e => {
-                                        if (isCurrentStack(e)) {
-                                            if (e.target) {
-                                                e.innerHTML = e.target.track(data);
-                                            }
-                                        }
-                                    });
-    
-                                    root.querySelectorAll('[soft-show]').forEach(e => {
-                                        if (isCurrentStack(e)) {
-                                            if (!evaluator.evaluate(e.getAttribute('soft-show'), data)) {
-                                                e._style = e._style || {};
-                                                e._style.display = e._style.display ?? e.style.display;
-                                                e.style.display = 'none';
-                                            }
-                                            else {
-                                                if (e.style.display == 'none') {
-                                                    e.style.display = e._style?.display;
-                                                    e._style.display = null;
-                                                }
-                                            }
-                                        }
-                                    });
-    
-                                    root.querySelectorAll('[soft-class]').forEach(e => {
-                                        if (isCurrentStack(e)) {
-                                            e.getAttribute('soft-class').split(';').forEach(x => {
-                                                const pair = x.split(':');
-                                                const cls = evaluator.evaluate(pair[0], data);
-                                                const add = pair.length > 1 ? evaluator.evaluate(pair[1], data) : true;
-                                                add ? e.classList.add(cls) : e.classList.remove(cls);
-                                            });
-                                        }
-                                    });
-
-                                    root.querySelectorAll('[soft-model]').forEach(e => {
-                                        if (isCurrentStack(e)) {
-                                            e.value = evaluator.evaluate(e.getAttribute('soft-model'), data);
-                                        }
-                                    });
-    
-                                    root.querySelectorAll('.softrepeat__').forEach(element => {
-                                        if (isCurrentStack(element)) {
-                                            const template = sftrp[element.getAttribute('_sftrp')];
-                                            const args = template.getAttribute('soft-for').split(':');
-                                            const source = evaluator.evaluate(args[1], data);
-                                            
-                                            let container = element.querySelector('._sftrp_in');
-    
-                                            if (!container) {
-                                                container = document.createElement('span');
-                                                container.className = '_sftrp_in';
-                                                element.appendChild(container);
-                                            }
-                                            
-                                            const collection = [].slice.call(element.children[0]?.children || []).map(x => ({ keep: false, item: x }));
-    
-                                            source.forEach((x, i) => {
-                                                const contender = collection.find(o => o.item._scope?.[args[0]] === x);
-    
-                                                if (contender) {
-                                                    contender.keep = true;
-                                                    this.refresh(contender.item, contender.item._scope);
-                                                }
-                                                else {
-                                                    const that = scopemerge(element, { [args[0]]: x, 'self': this._data });
-                                                    const el = template.cloneNode(true);
-                                                    softbind(el, that);
-                                                    this.refresh(el, that);
-                                                    container.appendChild(el);
-                                                }
-                                            });
-    
-                                            collection.forEach(x => {
-                                                if (!x.keep) {
-                                                    container.removeChild(x.item);
-                                                    //todo: remove from sftrp?
-                                                }
-                                            });
-                                        }
-                                    });
-                                }
+                                
+                                cyclone.blow(root || this._root, data || this._data);
                             }
                         }
     

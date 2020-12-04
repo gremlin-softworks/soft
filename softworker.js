@@ -44,11 +44,12 @@
                         .then(e => e.json().then(e => config = e));
 
                     await buildFramework();
-
+                    
                     return master.proto([mainmodule], function (mainmod) {
 
                         const worker = data => {
                             const id = data.id;
+
                             mainmod.connect({ payload: data.payload, port: { post: reply => {
                                 postMessage({
                                     id: id,
