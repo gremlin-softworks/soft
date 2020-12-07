@@ -1,5 +1,5 @@
 {
-    "scriptPath": "/example/js/workers",
+    "scriptPath": "/soft/example/js/workers",
     "modules": {
         "mandel": "mandel.js",
         "workerone": "workerone.js"

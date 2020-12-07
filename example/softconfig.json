@@ -1,8 +1,8 @@
 {
-    "scriptPath": "/example/js/",
+    "scriptPath": "/soft/example/js/",
     "commonCss": [
-        "/example/css/style.css",
-        "/example/css/bulma.min.css"
+        "/soft/example/css/style.css",
+        "/soft/example/css/bulma.min.css"
     ],
     "modules": {
         "generator": "generator.js",

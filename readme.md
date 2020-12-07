@@ -4,7 +4,7 @@ Created as an counter reaction to a constant use of javascript mvc frameworks at
 [Introduction and basics](docs/readme.md) Using soft and its components.  
 [DOM and bindings](docs/softbinding.md) Binding data in fragments to DOM.   
 [Multithreading](docs/softworker.md) Using workers in soft.  
-[Framwork modules](docs/modules.md) Useful modules.  
+[Framework modules](docs/modules.md) Useful modules.  
 ## Example
 [Online example app](http://gremlinsoft.se/soft/example) Covering most features.
 
