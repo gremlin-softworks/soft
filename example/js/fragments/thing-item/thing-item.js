@@ -18,7 +18,7 @@ export default function(master) {
 
                 self.run = start => start ? run(self.running = true) : self.running = false;
 
-                generator.canvas(root.querySelector('#canvas')).then(e => cvs = e);
+                generator.canvas(root.querySelector('#canvas'), self.$attributes.tilt).then(e => cvs = e);
 
                 self.change();
             }

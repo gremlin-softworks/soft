@@ -8,13 +8,65 @@ export default function(master) {
         return { 
             instance: (root, self) => {
 
+                self.items = [];
+
                 self.obj = {
                     name: 'Gremlin',
-                    seen: false,
-                    showbig: true
+                    seen: false
                 };
 
-                self.items = [];
+                self.options = { 
+                    panel: {
+                        label: 'Show panel',
+                        selected: true
+                    },
+                    something: {
+                        label: 'Something else',
+                        selected: false
+                    }
+                };
+
+                self.creations = [
+                    {
+                        type: 'rgb',
+                        label: 'Channels',
+                        active: true,
+                        change: me =>  {
+                            me.values.forEach(x => x.value = me.active);
+                            self.dirty();
+                        },
+                        values: [
+                            {
+                                name: 'red',
+                                field: 'r',
+                                value: true
+                            },
+                            {
+                                name: 'green',
+                                field: 'g',
+                                value: true
+                            },
+                            {
+                                name: 'blue',
+                                field: 'b',
+                                value: true
+                            }
+                        ]
+                    }
+                ];
+
+                self.getTilt = () => {
+                    const cr = self.creations.find(x => x.type === 'rgb');
+                    const r = 1 + Math.random() * 10;
+                    const g = 1 + Math.random() * 10;
+                    const b = 1 + Math.random() * 10;
+
+                    return {
+                        r: cr.active ? cr.values.find(x => x.field === 'r').value ? r : 0 : r,
+                        g: cr.active ? cr.values.find(x => x.field === 'g').value ? g : 0 : g,
+                        b: cr.active ? cr.values.find(x => x.field === 'b').value ? b : 0 : b
+                    }
+                };
 
                 self.clear = () => self.items = [];
 
@@ -23,8 +75,6 @@ export default function(master) {
                 self.additem = () => self.items.push(generator.create(Math.random()));
 
                 self.close = item => self.items.splice(self.items.indexOf(item), 1);
-
-                self.getClass = () => items.length === 0 ? 'is-danger' : 'is-primary';
             }
         }
     });

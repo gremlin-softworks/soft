@@ -26,3 +26,14 @@
 .red {
     background-color: rgb(240, 140, 140);
 }
+
+.choice {
+    padding-left: 20px;
+    padding-right: 40px;
+}
+
+.gmn-section {
+    display: inline-block;
+    width: 100%;
+    margin-bottom: 20px;
+}

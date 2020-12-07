@@ -121,6 +121,16 @@ self.started = item => {
 };
 ```
 
+## Soft-enabled
+
+```soft-enabled``` used on form controls, it is argumented with a statement and is scoped. It is the inversion of disabled.
+
+**Example**  
+```
+<input type="checkbox" soft-enabled="options.enabled" />
+```
+
+
 # Model binding
 ## soft-model
 The binding is two way the argument should be an appropriate property within ```self``` or descendants so that the proxy is triggered. Various input types may be applied.

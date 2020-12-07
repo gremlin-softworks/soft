@@ -17,19 +17,43 @@
                 </div>
             </div>
         </div>
-        <button class="button btn" soft-on-event="click:additem">Add thing</button>
-        <button class="button btn" soft-class="'red':items.length == false" soft-click="clear()">Clear things</button>
-        <label class="checkbox">
-            <input type="checkbox" soft-model="obj.showbig" />
-            Show panel
-        </label>
-        <div class="notification is-light is-primary" soft-show="obj.showbig">
+        <div class="gmn-section">
+            <button class="button btn" soft-on-event="click:additem">Add thing</button>
+            <button class="button btn is-light" soft-class="'is-danger':items.length == false" soft-click="clear()">Clear things</button>
+            
+            <div style="display: inline-block;" class="is-pulled-right">
+                <div class="choice" soft-for="creation:creations">
+                    <label class="checkbox">
+                        <input type="checkbox" soft-on='change:creation.change(creation)' soft-model="creation.active" />
+                        {{creation.label}}
+                    </label><br>
+                    <div class="choice" soft-for="item:creation.values">
+                        <label class="checkbox">
+                            <input type="checkbox" soft-enabled="creation.active" soft-model="item.value" />
+                            {{item.name}}
+                        </label>
+                    </div>
+                </div>
+            </div>
+
+            <div class="choice is-pulled-right">
+                <label class="checkbox">
+                    <input type="checkbox" soft-model="options.panel.selected" />
+                    {{options.panel.label}}
+                </label><br>
+                <label class="checkbox">
+                    <input type="checkbox" soft-enabled="options.panel.selected"  soft-model="options.something.selected" />
+                    {{options.something.label}}
+                </label>
+            </div>
+        </div>
+        <div class="notification is-light is-primary" soft-class="'is-primary':items.length" soft-show="options.panel.selected">
             You have {{ items.length }} things.
         </div>
         <div soft-for="item:items">
             <div class="go-thing is-info">
                 <a soft-click="close(item)" class="delete"></a>
-                <thing-item item="{item}"></thing-item>
+                <thing-item tilt={getTilt()} item="{item}"></thing-item>
             </div>
         </div>
     </div>

@@ -30,7 +30,7 @@ export default function(master) {
             root.querySelectorAll("[soft-on]").forEach(e => {
                 e.getAttribute('soft-on').split(';').forEach(x => {
                     const args = x.trim().split(':');
-                    e.addEventListener(args[0], () => evaluator.evaluate(args[1], data));
+                    e.addEventListener(args[0], () => setTimeout(() => evaluator.evaluate(args[1], data)));
                 });
             });
 
@@ -54,6 +54,10 @@ export default function(master) {
                     e.addEventListener(event, () => evaluator.property(e.getAttribute('soft-model'), 
                         e.type === 'checkbox' ? e.checked : e.value, data))
                 );
+            });
+
+            root.querySelectorAll('[soft-enabled]').forEach(e => {
+                e.disabled = !evaluator.evaluate(e.getAttribute('soft-enabled'), data);
             });
         };
 
@@ -108,6 +112,12 @@ export default function(master) {
                     const add = pair.length > 1 ? evaluator.evaluate(pair[1], data) : true;
                     add ? e.classList.add(cls) : e.classList.remove(cls);
                 });
+            }
+        });
+
+        const enableds = (root, data) => root.querySelectorAll('[soft-enabled]').forEach(e => {
+            if (isCurrentStack(e, root)) {
+                e.disabled = !evaluator.evaluate(e.getAttribute('soft-enabled'), data);
             }
         });
 
@@ -167,6 +177,7 @@ export default function(master) {
             shows(root, data);
             classes(root, data);
             models(root, data);
+            enableds(root, data);
             repeaters(root, data);
         };
 

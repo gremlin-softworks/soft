@@ -72,6 +72,8 @@ export default function(context) {
                                     this.refresh();
                                     dirty.set = null;
                                 });
+
+                                this.dirty = dirty;
     
                                 safeInstance().then(() => {
                                     for (let i = 0; i < this.attributes.length; i++) {
@@ -115,7 +117,6 @@ export default function(context) {
                             }
     
                             refresh(root, data) {
-                                
                                 cyclone.blow(root || this._root, data || this._data);
                             }
                         }

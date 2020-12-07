@@ -7,17 +7,17 @@ export default function(master) {
             let real = x;
             let imaginary = y;
     
-            for (let i = 0; i < 1024; i++) {
+            for (let i = 0;; i++) {
                 const a = real ** 2 - imaginary ** 2 + x;
                 const b = 2 * real * imaginary + y;
                 const c = a * b;
-                if (c > 12 || isNaN(c) || isNaN(c)) {
+                
+                if (i === 1023 || c > 12 || isNaN(c) || isNaN(c)) {
                     return {r: i * tilta % 256, g: i * tiltb % 256, b: i * tiltc % 256};
                 }
                 real = a;
                 imaginary = b;
             }
-            return { r: 0, g: 0, b: 0 };
         };  
     
         const drawPixel = (canvasData, x, y, color, size) => {

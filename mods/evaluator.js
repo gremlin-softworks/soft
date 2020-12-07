@@ -12,14 +12,14 @@ export default function(master) {
         const value = (expression, data) => {
             expression = expression.trim();
 
+            if (expression.startsWith("'") || expression.startsWith('"')) {
+                return expression.substring(1, expression.length - 1);
+            }
             if (expression.indexOf('+') > 0) {
                 return expression.split('+').map(x => value(x, data)).reduce((x, y) => x + y);
             }
             if (expression.indexOf('-') > 0) {
                 return expression.split('-').map(x => value(x, data)).reduce((x, y) => x - y);
-            }
-            if (expression.startsWith("'") || expression.startsWith('"')) {
-                return expression.substring(1, expression.length - 1);
             }
             if (!isNaN(expression)) {
                 return Number(expression);
@@ -72,7 +72,8 @@ export default function(master) {
 
                 return value;
             }
-            return value(expression, data);
+            return expression.startsWith('!') ? !value(expression.substring(1), data)
+             : value(expression, data);
         };
 
         return class Evaluator {
