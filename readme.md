@@ -1,5 +1,5 @@
 # Soft Framework
-Created as an counter reaction to q constant use of javascript mvc frameworks at work. For my own leisure I put together one of my own, softly. It is not by any means complete or perfect, but it is a working mvc framework with worker support and dependency injection.
+Created as an counter reaction to a constant use of javascript mvc frameworks at work. For my own leisure I put together one of my own, softly. It is not by any means complete or perfect, but it is a working mvc framework with worker support and dependency injection.
 ## Documentation
 [Introduction and basics](docs/readme.md) Using soft and its components.  
 [DOM and bindings](docs/softbinding.md) Binding data in fragments to DOM.   
