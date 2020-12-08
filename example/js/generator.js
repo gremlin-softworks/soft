@@ -3,7 +3,7 @@ export default function(master) {
         
         const worker = $workerpool.construct().build(1).aquire();
 
-        worker.connect('workerone.js', { baseUrl: '/soft/example' });
+        worker.connect('workerone.js', { baseUrl: '/example' });
 
         const getProto = tilt => {
 
