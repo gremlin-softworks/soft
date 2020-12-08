@@ -20,7 +20,7 @@ export default function(master) {
                     return workers.length > 0 ? workers.splice(0, 1)[0] : null;
                 }
                 
-                build(count, residence = 'softworker.js') {
+                build(count, residence = 'soft.js') {
                     while (count-- > 0) {
                         xworker.construct(events, $gmn._path + '/' + residence);
                     }

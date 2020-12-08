@@ -1,5 +1,19 @@
 export default function(context) {
 
+    String.prototype.format = function () {
+        return this.replace(/\{\{|\}\}|\{([a-zA-Z0-9_]+)\}/g, (bracks, index) => 
+            ((bracks == "{{") ? "{" : ((bracks == "}}") ? "}" : arguments[index])));
+    };
+    
+    ShadowRoot.prototype.softSelector = Element.prototype.softSelector = function() {
+        const el = this.querySelector(...arguments);
+        return el?.soft || el;
+    };
+    
+    ShadowRoot.prototype.softSelectorAll = Element.prototype.softSelectorAll = function() {
+        return this.querySelector(...arguments).map(x => x?.soft || x);
+    };
+
     const master = context.master;
     const config = context.config;
     const instancePromises = [];

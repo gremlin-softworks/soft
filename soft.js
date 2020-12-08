@@ -1,28 +1,14 @@
-String.prototype.format = function () {
-    return this.replace(/\{\{|\}\}|\{([a-zA-Z0-9_]+)\}/g, (bracks, index) => 
-        ((bracks == "{{") ? "{" : ((bracks == "}}") ? "}" : arguments[index])));
-};
+$gmn = {
 
-ShadowRoot.prototype.softSelector = Element.prototype.softSelector = function() {
-    const el = this.querySelector(...arguments);
-    return el?.soft || el;
-};
-
-ShadowRoot.prototype.softSelectorAll = Element.prototype.softSelectorAll = function() {
-    return this.querySelector(...arguments).map(x => x?.soft || x);
-};
-
-window.$gmn = {
-
-    _path: document.currentScript.src.split('?')[0].split('/').slice(0, -1).join('/'),
+    _path: this.document?.currentScript.src.split('?')[0].split('/').slice(0, -1).join('/'),
 
     start: Date.now(),
-
-    import: url => import(url),
 
     events: null,
 
     canvas: null,
+
+    isWorker: !this.window,
 
     combine: (...parts) => parts.join('/').split('/').filter((e, i) => !i || e.length).join('/'),
 
@@ -52,11 +38,11 @@ window.$gmn = {
                     $gmn.canvas = canvas;
 
                     const keys = Object.keys(config.fragments);
-                    const basePath = (config.scriptPath ? config.scriptPath : baseUrl);
+                    const basePath = config.scriptPath ?? baseUrl;
                     let count = 0;
 
                     keys.forEach(key => $gmn.import($gmn.combine(basePath, config.fragments[key] + '?cache=' + $gmn.start)).then(md => {
-                        new md.default(master).then(mod => ++count === keys.length ? resolve() : null);
+                        new md.default(master).then(() => ++count === keys.length ? resolve() : null);
                     }));
 
                     if (!keys.length) {
@@ -67,7 +53,7 @@ window.$gmn = {
         };
 
         const buildFramework = async () => 
-            Promise.all(['proto', 'fragment', 'singleton'].map(key => $gmn.import($gmn.combine($gmn._path, key + '.js?cache=' + $gmn.start)).then(md => {
+            Promise.all(($gmn.isWorker ? ['proto', 'singleton'] : ['proto', 'fragment', 'singleton']).map(key => $gmn.import($gmn.combine($gmn._path, key + '.js?cache=' + $gmn.start)).then(md => {
                 master[key] = md.default({
                     resolveLocation, master, config, baseUrl
                 });
@@ -76,16 +62,69 @@ window.$gmn = {
         const master = Object.assign(args || {}, {
 
             app: async (modules, defintion) => {
-                await fetch($gmn.combine(configPath, 'softconfig.json?cache=' + $gmn.start)).then(e => e.json().then(e => config = e));
+                await fetch($gmn.combine(configPath, 'softconfig.json?cache=' + $gmn.start))
+                    .then(e => e.json().then(e => config = e));
+
                 await buildFramework();
                 await importResources();
 
                 setTimeout(() => $gmn.events.dispatch('fragments:loaded'));
 
                 return master.proto(modules, defintion);
+            },
+
+            worker: async mainmodule => {
+
+                await fetch($gmn.combine(configPath, 'softworkerconfig.json?cache=' + $gmn.start))
+                    .then(e => e.json().then(e => config = e));
+
+                await buildFramework();
+                
+                return master.proto([mainmodule], function (mainmod) {
+
+                    const worker = data => {
+                        const id = data.id;
+
+                        mainmod.connect({ payload: data.payload, port: { post: reply => {
+                            postMessage({
+                                id: id,
+                                payload: reply
+                            });
+                        }}});
+                    };
+
+                    $gmn._workers.push(worker);
+                });
             }
         });
 
         return master;
-    }
+    },
+
+    _workers: [],
+
+    _onmessage: this.onmessage = !this.window ? message => {
+        if (message.data.payload.$init) {
+            $gmn.master(message.data.payload.$init.options).worker(message.data.payload.$init.mainmodule);
+            postMessage({
+                id: message.data.id,
+                payload: { connected: true }
+            });
+        }
+        else {
+            $gmn._workers.forEach(e => e(message.data));
+        }
+    } : undefined,
+
+    import: !this.window && navigator.userAgent.toLowerCase().indexOf('firefox') > -1 ? (() => function(url) {
+        return new Promise((resolve, reject) => {
+            fetch(url).then(e => e.text().then(e => {
+                const index = e.indexOf('export default ');
+                resolve({ default: new Function('return ' + e.substring(index + 15))()});
+            }, e => reject(e)), e => reject(e));
+        })
+    })() : url => import(url)
+    
+    /* moz cant do dynamic module import in worker context, any regular module imports will fail :(
+       any trailing exports will cause exceptions */
 };

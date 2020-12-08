@@ -51,6 +51,7 @@
         </div>
         <div class="notification is-light is-primary" soft-class="'is-primary':items.length" soft-show="options.panel.selected">
             You have {{ items.length }} things.
+            <a soft-click="options.panel.selected = false" class="delete"></a>
         </div>
         <div soft-for="item:items">
             <div class="go-thing is-info">
