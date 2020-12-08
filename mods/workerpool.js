@@ -3,8 +3,8 @@ export default function(master) {
 
         function instance() {
 
-            var workers = [],
-                events = eventhandler.construct();
+            const workers = [];
+            const events = eventhandler.construct();
 
             class WorkerPool {
 

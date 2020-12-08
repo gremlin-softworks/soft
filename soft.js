@@ -38,9 +38,8 @@ window.$gmn = {
         const fromFramework = uri => $gmn.combine($gmn._path, uri.substring(1)) + '.js';
 
         const url = uri => {
-            const result = $gmn.combine(config.scriptPath ? config.scriptPath : baseUrl, config.modules[uri] || uri);
-            const hasExtension = (result.length > 4 && result.indexOf('.mjs') === result.length - 4) || 
-                (result.length > 3 && result.indexOf('.js') === result.length - 3);
+            const result = $gmn.combine(config.scriptPath ?? baseUrl, config.modules[uri] || uri);
+            const hasExtension = result.endsWith('.js') || result.endsWith('.mjs');
 
             return (hasExtension ? result : result + '.js') + '?id=' + $gmn.start;
         };
