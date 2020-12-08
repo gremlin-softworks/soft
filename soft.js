@@ -1,6 +1,6 @@
 $gmn = {
 
-    _path: this.document?.currentScript.src.split('?')[0].split('/').slice(0, -1).join('/'),
+    _path: (this.document?.currentScript.src || this.location.pathname).split('?')[0].split('/').slice(0, -1).join('/'),
 
     start: Date.now(),
 
