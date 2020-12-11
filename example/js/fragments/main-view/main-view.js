@@ -26,34 +26,32 @@ export default function(master) {
                     }
                 };
 
-                self.creations = [
-                    {
-                        type: 'rgb',
-                        label: 'Channels',
-                        active: true,
-                        change: me =>  {
-                            me.values.forEach(x => x.value = me.active);
-                            self.dirty();
+                self.creations = [{
+                    type: 'rgb',
+                    label: 'Channels',
+                    active: true,
+                    change: me =>  {
+                        me.values.forEach(x => x.value = me.active);
+                        self.dirty();
+                    },
+                    values: [
+                        {
+                            name: 'red',
+                            field: 'r',
+                            value: true
                         },
-                        values: [
-                            {
-                                name: 'red',
-                                field: 'r',
-                                value: true
-                            },
-                            {
-                                name: 'green',
-                                field: 'g',
-                                value: true
-                            },
-                            {
-                                name: 'blue',
-                                field: 'b',
-                                value: true
-                            }
-                        ]
-                    }
-                ];
+                        {
+                            name: 'green',
+                            field: 'g',
+                            value: true
+                        },
+                        {
+                            name: 'blue',
+                            field: 'b',
+                            value: true
+                        }
+                    ]
+                }];
 
                 self.getTilt = () => {
                     const cr = self.creations.find(x => x.type === 'rgb');

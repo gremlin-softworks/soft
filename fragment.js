@@ -45,7 +45,7 @@ export default function(context) {
     return (meta, modules, defintion) => {
         return new Promise(resolve => {
             master.singleton(modules, defintion).then(module => {
-                fetch($gmn.combine(config.scriptPath ? config.scriptPath : context.baseUrl, meta.template + '?cache=' + $gmn.start)).then(e => e.text()).then(html => {
+                fetch($gmn.combine(config.scriptPath ?? context.baseUrl, meta.template + '?cache=' + $gmn.start)).then(e => e.text()).then(html => {
                     master.proto(['$eventhandler', '$evaluator', '$cyclone'], (eventhandler, evaluator, cyclone) => {
     
                         const id = registerTemplate(html, meta.css);
