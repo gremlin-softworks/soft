@@ -155,7 +155,7 @@ export default function(master) {
                         all(contender.item, contender.item._scope);
                     }
                     else {
-                        const that = scopemerge(element, { [args[0]]: x, 'self': /*this._data*/ data });
+                        const that = scopemerge(element, { [args[0]]: x, 'self': data });
                         const el = template.cloneNode(true);
                         softbind(el, that);
                         all(el, that);

@@ -15,7 +15,7 @@ Markup is provided in fragment templates, fragment templates are html files. Fra
 
 The access to the bound module from markup is done through the proxy object ```self``` passed to the fragment implementation. The bound object can be accessed in markup via different references and applied in functions.  
   
-Access to dom from the bound module is done usually done by softSelector or softSelectorAll when you need to access bound data. ```root``` is an element and can of course be queried normally for other purposed, but this querydata is also included in the softSelectors.  
+Access to dom from the bound module is usually done by softSelector or softSelectorAll when you need to access bound data. ```root``` is an element and can of course be queried normally for other purposed, but this querydata is also included in the softSelectors.  
   
 
 ```

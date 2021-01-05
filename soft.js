@@ -38,10 +38,9 @@ $gmn = {
                     $gmn.canvas = canvas;
 
                     const keys = Object.keys(config.fragments);
-                    const basePath = config.scriptPath ?? baseUrl;
                     let count = 0;
 
-                    keys.forEach(key => $gmn.import($gmn.combine(basePath, config.fragments[key] + '?cache=' + $gmn.start)).then(md => {
+                    keys.forEach(key => $gmn.import($gmn.combine(config.scriptPath ?? baseUrl, config.fragments[key] + '?cache=' + $gmn.start)).then(md => {
                         new md.default(master).then(() => ++count === keys.length ? resolve() : null);
                     }));
 

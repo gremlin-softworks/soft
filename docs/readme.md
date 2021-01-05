@@ -194,7 +194,7 @@ Fragment markup and bindings are covered in the soft binding section [here](soft
 
 ### ```master.proto([dependencies], definition);```
 
-Creates a regular soft-module. Must be defined in the exported default method (see example), the default method must have the master object as argument. The default method should in turn return the result of calling proto on the master object, having the the dependency references and defintion as arguments.
+Creates a regular soft-module. Must be defined in the exported default method (see example), the default method must have the master object as argument. The default method should in turn return the result of calling proto on the master object, having the dependency references and defintion as arguments.
 
 ```
 export default function (master) {

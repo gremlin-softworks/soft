@@ -34,23 +34,21 @@ export default function(master) {
                         me.values.forEach(x => x.value = me.active);
                         self.dirty();
                     },
-                    values: [
-                        {
-                            name: 'red',
-                            field: 'r',
-                            value: true
-                        },
-                        {
-                            name: 'green',
-                            field: 'g',
-                            value: true
-                        },
-                        {
-                            name: 'blue',
-                            field: 'b',
-                            value: true
-                        }
-                    ]
+                    values: [{
+                        name: 'red',
+                        field: 'r',
+                        value: true
+                    },
+                    {
+                        name: 'green',
+                        field: 'g',
+                        value: true
+                    },
+                    {
+                        name: 'blue',
+                        field: 'b',
+                        value: true
+                    }]
                 }];
 
                 self.getTilt = () => {
