@@ -139,7 +139,7 @@ Any css declared in the meta object will be isolated to the fragment and the pro
 The fragment module acts basically as a singleton and the defintion will only be called once.
 
 The fragment is bound to the dom by the ```self``` object (the second instance parameter). This is a proxy object. Bind any functions or data on this that you want to expose to dom. Query the root object (the fragments dom) to access any other scoped data in child fragments or other scopes inferred (ie. using ```soft-for```). 
-This is done using ```root.softSelector``` or ```root.softSelectorAll``` which are convience methods matching ```root.querySelector``` and ```root.querySelectorAll``` but returning bound data.
+This is done using ```root.softSelector``` or ```root.softSelectorAll``` which are convenience methods matching ```root.querySelector``` and ```root.querySelectorAll``` but returning bound data.
 
 ```
 export default function(master) {
@@ -265,7 +265,7 @@ Simple and soft configuration, map explicit modules to aliases you can use in de
      }
 }
 ```
-While listing modules here allows for aliases, modules may be loaded without being listed here, but a relative path to the scriptPath must be provided then in the module references when creating a app, proto or singleton. However any '.js' or '.mjs' may be omitted arbitarily in the module references. In the config the extension be present. Loading modules outside the scriptPath is not possible. Default ```scriptPath``` is the baseUrl property of the calling app.
+While listing modules here allows for aliases, modules may be loaded without being listed here, but a relative path to the scriptPath must be provided then in the module references when creating a app, proto or singleton. However any '.js' or '.mjs' may be omitted arbitarily in the module references. In the config the extension must be present. Loading modules outside the scriptPath is not possible. Default ```scriptPath``` is the baseUrl property of the calling app.
 
 Fragments should be declared with selector and relative path.
 
